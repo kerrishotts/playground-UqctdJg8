@@ -2,6 +2,12 @@
 
 This Basic template lets you get started quickly with a simple working example. If it is your first contribution then you should have a look at the [Getting Started](https://tech.io/doc/getting-started-create-playground) document.
 
+```javascript runnable
+const zip = (a, b) => Array.from({length: Math.max(a.length, b.length)}).map((_, idx) => [a[idx], b[idx]]);
+
+console.log(zip([1, 2, 3, 4], ["one", "two", "three", "four"]));
+```
+
 
 Please refer to the [documentation](https://tech.io/doc) to learn more about adding programming exercises within your contribution.
 
