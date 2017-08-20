@@ -52,7 +52,7 @@ function sum() {
 console.log(sum(4, 5, 6));
 ```
 
-In **[A]** we take advantage of `call` to convince `slice` to convert `arguments` into a real `Array`. It works because `slice` can operate on array-like objects. If we do the same thing to the first example, we'd get back a real array of `4, 5, 6`, and the above example works on the same principle.
+In **[A]** we take advantage of `call` to convince `slice` to convert `arguments` into a real `Array`. It works because `slice` can operate on array-like objects. If we do the same thing to the first example, we'd get back a real array of `[4, 5, 6]`, and the above example works on the same principle.
 
 Another common occurence is when you work with the DOM (Document Object Model) in a web view. You can ask the DOM to return all elements matching a certain criteria, but the return result isn't an array -- it just looks like one. Thankfully the same pattern works here too.
 
@@ -90,7 +90,7 @@ console.log(chars);
 Or, we could do something like this:
 
 ```javascript runnable
-const items = Array.from({
+const chars = Array.from({
         0: "a",
         1: "b",
         2: "c",
@@ -101,7 +101,9 @@ console.log(chars);
 
 But that’s not all — `Array.from` doesn’t just take one argument — it can take three. Here’s the signature:
 
-> `Array.from(arrayLike [, mapFn [, thisArg]]) -> Array`
+```
+Array.from(arrayLike [, mapFn [, thisArg]]) -> Array
+```
 
 Hmm — interestingly enough, `Array.from` acts a bit like `Array.map`, and is mostly functionally equivalent to `Array.from(arrayLike).map(mapFn [, thisArg])` so why would one ever write anything else? Simple: it saves some memory and also avoids some unexpected results by avoiding the creation of an intermediate array. This isn’t something you’ll run into with run-of-the-mill array-likes, but can cause problems with certain array subclasses, like `TypedArrays`.
 
@@ -109,7 +111,7 @@ Hmm — interestingly enough, `Array.from` acts a bit like `Array.map`, and 
 
 So we could take the above and write the following:
 ```javascript runnable
-const items = Array.from({
+const chars = Array.from({
         0: "a",
         1: "b",
         2: "c",
@@ -121,16 +123,48 @@ console.log(chars);
 We can also use this feature to create arrays of arbitrary length. An array-like only needs to contain a length property, so we can do this:
 
 ```javascript runnable
-const tenIntegers = Array.from({length:10}, (_, idx) => idx);
+const tenIntegers = Array.from({length: 10}, (_, idx) => idx);
 console.log(tenIntegers);
 ```
 
 We can use this to create arbitrary sequences too, which can be quite useful. For example, we can easily create the first few powers of two:
 
 ```javascript runnable
-const firstPowersOfTwo = Array.from({length: 11}, (_, idx) => 
-      2 ** idx);
+const firstPowersOfTwo = Array.from({length: 11}, (_, idx) => 2 ** idx);
 console.log(firstPowersOfTwo);
 ```
 
 It’s also worth mentioning that `Array.from` works on anything that is Iterable, so it works on Maps, Sets, and Generators as well. Those are larger topics in and of themselves, so look for those articles in the future!
+
+::: Taking a trip down the rabbit hole
+
+So, having read the above, you may be tempted to try the following in ES5:
+
+```javascript runnable
+var tenIntegers = [].slice.call({length: 10})
+    .map(function(_, idx) {
+        return idx;
+    });
+console.log(tenIntegers)
+```
+
+Looks like it should work, right? Run it though, and you'll get an `Array` of length `10`, yes, but without any actual items in it. `Array.from` will create missing elements as needed, but `slice` does not, and the mapping function is only ever called with elements that exist. You can see that at work in the following snippet.
+
+```javascript runnable
+const arrayLikeWithHoles = {
+    length: 5,
+    2: "c",
+    4: "f"
+}
+const a = Array.from(arrayLikeWithHoles);
+console.log(a);                   // [ undefined, undefined, "c", undefined, "f"]
+console.log(a.hasOwnProperty(3)); // true
+
+var b = [].slice.call(arrayLikeWithHoles);
+console.log(b);                   // [ , , "c", , "f"]
+console.log(b.hasOwnProperty(3)); // false
+```
+
+Note that `b` in the above example doesn't have `3` as a property key, whereas `a` does. This is a pretty huge difference between `Array.slice` and `Array.from`.
+
+:::
