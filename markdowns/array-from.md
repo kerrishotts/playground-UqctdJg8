@@ -168,3 +168,11 @@ console.log(b.hasOwnProperty(3)); // false
 Note that `b` in the above example doesn't have `3` as a property key, whereas `a` does. This is a pretty huge difference between `Array.slice` and `Array.from`.
 
 :::
+
+::: Sources
+
+* https://davidwalsh.name/array-from
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/from
+
+:::
