@@ -6,3 +6,5 @@ plan:
     statement: markdowns/intro.md # Set the file path to the page content
   - title: Array.from
     statement: markdowns/array-from.md
+  - title: Rest
+    statement: markdowns/rest.md
