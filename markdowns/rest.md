@@ -29,6 +29,7 @@ function fmt(formatStr) {
             } else acc += piece;
             return acc;
         }, "");
+    return str;
 // }
 }
 
@@ -75,13 +76,15 @@ console.log(fmt("Hello, %s! The answer to everything is %i", "World", 42));
 ```
 
 So, what do I like about this? Several things:
-* args is an actual array containing all the arguments after the format string — no fiddling with slice and no need to specify an offset.
-* Self-documenting. We know that if nothing is provided, formatStr will be an empty string, and it’s obvious from the signature that the function can accept any number of additional arguments.
-* Extra bonus: args is always guaranteed to be an Array. If no additional arguments are passed, it just happens to be an empty array with length zero.
+* `args` is an actual array containing all the arguments after the format string — no fiddling with `slice` and no need to specify an offset.
+* Self-documenting. We know that if nothing is provided, `formatStr` will be an empty string, and it’s obvious from the signature that the function can accept any number of additional arguments.
+* Extra bonus: `args` is always guaranteed to be an `Array`. If no additional arguments are passed, it just happens to be an empty array with length zero.
 
 The rest operator works similarly with destructuring as well:
 
+```
 const [favoriteColor, ...otherColorsILike] = "purple blue pink red black".split(/\s+/);
+```
 
 Here, favoriteColor will receive the value “purple”, and otherColorsILike will be an array of ["blue", "pink", "red", "black"] .
 
