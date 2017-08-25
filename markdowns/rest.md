@@ -1,6 +1,6 @@
-The “rest” operator (`..`.) collects the remaining items from an iterable into an array. It’s used hand-in-hand with destructuring and with argument lists, and is really pretty awesome. 
+The “rest” operator (`...`) collects the remaining items from an iterable into an array. It’s used hand-in-hand with destructuring and with argument lists, and is really pretty awesome. 
 
-Note: In this section I’m only going to cover rest’s association with iterables. There is a proposal at stage 3 that allows it to work with objects, and you’ve probably already seen it in production code when using Babel as a transpiler alongside React or other similar frameworks. Even so, it’s not standard yet, so I’m not covering it in this post.
+Note: In this section I’m only going to cover Rest’s association with iterables. There is a proposal at stage 3 that allows it to work with objects, and you’ve probably already seen it in production code when using Babel as a transpiler alongside React or other similar frameworks. Even so, it’s not standard yet, so I’m not covering it in this post.
 
 Let’s imagine that we’re writing a logging function that needs to take a format string and an arbitrary number of additional arguments. In ES5 we’d have written the following (expand to see the full code snippet if you want):
 
@@ -37,15 +37,42 @@ console.log(fmt("Hello, %s! The answer to the ultimate question is %i", "World",
 
 I have several problems with a function like this:
 
-* We have to convert arguments to an array using [].slice.call.
-* We have to remember to avoid the first argument, since we don’t want to to treat our format string as an additional argument.
-* It’s not at all self-documenting — the arity (number of arguments taken) looks like 1, but in reality, the function can take any number of arguments. Without additional documentation, it’s not immediately obvious that this function can take any number of arguments, and is apt to confuse any IDE that attempts to provide some degree of code insight.
+* It requires conversion of `arguments` to an `array` using `[].slice.call`.
+* The code has to avoid the first argument, since the function shouldn't treat the format string as an additional argument.
+* It’s not at all self-documenting — the arity (number of arguments taken) looks like 1, but in reality, the function can take any number of arguments. Without additional documentation, it’s not immediately obvious that this function can take any number of arguments, and is likely to confuse any IDE that attempts to provide some degree of code insight.
 
 But with ES2015, things become clearer:
 
-function log(formatStr = "", ...args) {
-    /* do something with formatStr and args */
-}
+```javascript runnable
+function fmt(formatStr = "", ...args) {
+// { autofold
+    let argIdx = 0;
+    const regex = /(\%[s|i|f])/g,
+          pieces = formatStr.split(regex),
+          str = pieces.reduce((acc, piece) => {
+            if (piece[0] === "%") {
+                switch(piece[1]) {
+                    case "s":
+                        acc += args[argIdx++].toString();
+                        break;
+                    case "f":
+                        acc += parseFloat(args[argIdx++]);
+                        break;
+                    case "i":
+                        acc += parseInt(args[argIdx++], 10);
+                        break;
+                    default:
+                        acc += piece;
+                }
+            } else acc += piece;
+            return acc;
+        }, "");
+    return str;
+    // }
+};
+
+console.log(fmt("Hello, %s! The answer to everything is %i", "World", 42));
+```
 
 So, what do I like about this? Several things:
 * args is an actual array containing all the arguments after the format string — no fiddling with slice and no need to specify an offset.
